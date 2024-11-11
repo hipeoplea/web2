@@ -35,7 +35,7 @@ function getValidatedXR(n) {
 async function validateInput(event) {
     event.preventDefault();
     const xRes = getValidatedXR('X');
-    const yRes = getValidatedY;
+    const yRes = getValidatedY();
     const rRes = getValidatedXR('R');
 
     if (xRes == null || yRes == null || rRes == null) {
@@ -44,6 +44,7 @@ async function validateInput(event) {
         if (rRes == null) alert(ANSWERS.R_ERROR);
         return;
     }
+    console.log(`Validated inputs: X = ${xRes}, Y = ${yRes}, R = ${rRes}`);
     sendRequestAndHandleResponse(xRes, yRes, rRes);
 }
 
@@ -82,24 +83,42 @@ async function validateInputFromMouse(event) {
 
 }
 
+async function handleResponse(xResult, yResult, rResult, hit) {
+    let body = document.querySelector('tbody');
+    let passPoint = document.getElementById('no-data');
+    if (passPoint) {
+        passPoint.remove();
+    }
+    let answRow = document.createElement("tr");
+    answRow.innerHTML = `
+        <td>${xResult}</td>
+    <td>${yResult}</td>
+    <td>${rResult}</td>
+    <td>${ANSWERS.HIT_RESULT[hit]}</td>`
+    ;
+    body.appendChild(answRow);
+    writeDotResult(xResult, yResult, rResult, hit)
+
+}
+
 function sendRequestAndHandleResponse(x, y, r) {
     const request = {
-        method: "Get",
-    }
-%
-    fetch(`/webLab2/controller?x=${x}&y=${y}&z=${z}`, request)
+        method: "GET",
+    };
+
+    fetch(`/webLab2/areaCheck?x=${x}&y=${y}&r=${r}`, request)
         .then(response => {
             if (response.ok) {
-                return response.headers;
+                return response.json();
             } else {
                 console.error('Send error: ', response.statusText);
+                return null;
             }
         })
         .then(data => {
             if (data) {
                 console.log(data);
-                addDataRow(data["x"], data["y"], data["r"], data["isHit"]);
-                writeDotResult(data["x"], data["y"], data["r"], data["isHit"]);
+                handleResponse(data.X, data.Y, data.R, data.isHit);
             }
         })
         .catch(error => console.error("Fetch error: ", error));

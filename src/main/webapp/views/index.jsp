@@ -1,6 +1,5 @@
 <%@ page import="models.Point" %>
 <%@ page import="java.util.List" %>
-<%@ page import="beanKomponents.SessionDataBean" %>
 <%@ page import="java.util.Objects" %>
 <%@ page import="java.util.Locale" %>
 
@@ -178,39 +177,7 @@
             <circle id="answerDot" cx="100" cy="100" r="0" fill="black"></circle>
         </svg>
     </div>
-    <div class="table">
-        <table class="results">
-            <thead>
-            <tr class="table-header">
-                <th>X</th>
-                <th>Y</th>
-                <th>R</th>
-                <th>Попадание</th>
-                <th>Время выполнения программы</th>
-                <th>Текущее время</th>
-            </tr>
-            </thead>
-            <tbody>
-            <%SessionDataBean data = (SessionDataBean) request.getSession().getAttribute("data");
-            if(data != null){
-                for (Point point: data.getDataList()){
-            %>
-            <tr>
-                <td><%= String.format(Locale.US, "%.2f", point.getX()) %>
-                </td>
-                <td><%= String.format(Locale.US, "%.2f", point.getY()) %>
-                </td>
-                <td><%= String.format(Locale.US, "%.2f", point.getR()) %>
-                </td>
-                <td><%= point.isHit() ? "Да" : "Нет" %>
-                </td>
-            </tr><%
-                    }
-            } %>
-            </tbody>
-        </table>
-    </div>
-</div>
+    <jsp:include page="table.jsp"></jsp:include>
 </body>
 <script src="scripts/script.js"></script>
 </html>

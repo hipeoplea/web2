@@ -1,6 +1,5 @@
 package servlets;
 
-import beanKomponents.SessionDataBean;
 import checker.Checker;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
@@ -11,50 +10,54 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.Point;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import static java.lang.Double.parseDouble;
 
-
 @WebServlet("/areaCheck")
 public class AreaCheckServlet extends HttpServlet {
-    private Point point;
+
+    Logger logger = Logger.getLogger(AreaCheckServlet.class.getName());
+
     @Override
+//    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+
         try {
             Point point = parseRequest(request);
             if (!validatePointValues(point)) {
                 throw new NumberFormatException();
             }
 
-        } catch (NumberFormatException e) {
+            point.setHit(Checker.check(point));
+            logger.info("Point: " + point);
+
+            List<Point> dots = (List<Point>) request.getSession().getAttribute("result");
+            if (dots == null) {
+                dots = new ArrayList<>();
+            }
+            dots.add(point);
+            request.getSession().setAttribute("result", dots);
+            Gson gson = new Gson();
+            response.getWriter().write(gson.toJson(point));
+        } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid point");
-            return;
         }
-
-        SessionDataBean data = (SessionDataBean) request.getSession().getAttribute("data");
-        if (data == null){
-            data = new SessionDataBean();
-        }
-
-        point.setHit(Checker.check(point));
-        Gson gson = new Gson();
-        response.getWriter().write(gson.toJson(point));
-        data.addData(point);
-        request.getSession().setAttribute("data", data);
     }
 
-    private Point parseRequest(HttpServletRequest request)
-            throws NumberFormatException {
-       Point point = new Point();
-       String x = request.getParameter("x");
-       String y = request.getParameter("y");
-       String r = request.getParameter("z");
-       point.setX(parseDouble(x));
-       point.setY(parseDouble(y));
-       point.setR(parseDouble(r));
-       return point;
+    private Point parseRequest(HttpServletRequest request) throws NumberFormatException {
+        Point point = new Point();
+        String x = request.getParameter("x");
+        String y = request.getParameter("y");
+        String r = request.getParameter("r");
+        point.setX(parseDouble(x));
+        point.setY(parseDouble(y));
+        point.setR(parseDouble(r));
+        return point;
     }
 
     private boolean validatePointValues(Point point) {

@@ -1,7 +1,5 @@
 package servlets;
 
-import beanKomponents.SessionDataBean;
-import jakarta.ejb.EJB;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,17 +11,19 @@ import java.io.IOException;
 @WebServlet("/controller")
 public class ControllerServlet extends HttpServlet {
 
-    @EJB
-    private
-    SessionDataBean sessionDataBean;
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        req.setAttribute("fromController", "true");
-        req.getRequestDispatcher("/areaCheck").forward(req, resp);
+        if (req.getParameter("x") != null && req.getParameter("y") != null && req.getParameter("r") != null) {
+            req.setAttribute("fromController", "true");
+            req.getRequestDispatcher("/areaCheck").forward(req, resp);
+        } else {
+            req.getRequestDispatcher("views/index.jsp").forward(req, resp);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("views/index.jsp").forward(req, resp);
+        resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+        resp.getWriter().write("Only Get Method allowed");
     }
 }

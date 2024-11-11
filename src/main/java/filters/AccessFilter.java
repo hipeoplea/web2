@@ -10,10 +10,8 @@
 //
 //@WebFilter("/areaCheck")
 //public class AccessFilter implements Filter {
-//
-//
 //    @Override
-//    public void init(FilterConfig filterConfig) {
+//    public void init(FilterConfig filterConfig) throws ServletException {
 //    }
 //
 //    @Override
@@ -22,15 +20,16 @@
 //        HttpServletRequest request = (HttpServletRequest) servletRequest;
 //        HttpServletResponse response = (HttpServletResponse) servletResponse;
 //
-//        if (request.getAttribute("controller").equals("true")) {
-//            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
-//            return;
+//        Object filter = (String) request.getAttribute("fromController");
+//        if (filter != null && filter.equals("true")) {
+//            filterChain.doFilter(request, response);
 //        }
 //
-//        filterChain.doFilter(request, response);
-//
+//        else {
+//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+//            response.getWriter().write("Access Denied");
+//        }
 //    }
-//
 //    @Override
 //    public void destroy() {
 //    }
