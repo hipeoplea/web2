@@ -1,11 +1,7 @@
 package servlets;
 
-import beans.BeanStatef;
-import beans.BeanStateless;
 import checker.Checker;
 import com.google.gson.Gson;
-import jakarta.ejb.EJB;
-import jakarta.ejb.Stateful;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,10 +18,6 @@ import static java.lang.Double.parseDouble;
 
 @WebServlet("/areaCheck")
 public class AreaCheckServlet extends HttpServlet {
-    @EJB
-    BeanStatef beanStatef;
-    @EJB
-    BeanStateless beanStateless;
 
     Logger logger = Logger.getLogger(AreaCheckServlet.class.getName());
 
@@ -35,8 +27,6 @@ public class AreaCheckServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
 
         try {
-            logger.info(beanStatef.getSample());
-            logger.info(beanStateless.getSample());
 
             Point point = parseRequest(request);
             if (!validatePointValues(point)) {
