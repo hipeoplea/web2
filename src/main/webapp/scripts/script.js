@@ -159,6 +159,46 @@ async function writeDotResult(xResult, yResult, rResult, hit) {
 
 }
 
+function fetchDataWithTimeout(url, timeout = 5000) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            reject(new Error("timeout passed"));
+        }, timeout);
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка сети");
+                }
+                return response.url;
+            })
+            .then(data => resolve(data)).catch(data => reject(data));
+    });
+}
+
+let count = 1;
+function tiposerver(){
+    let interval = setInterval(() => {
+        count++;
+        if (count % 4 === 0){
+            console.log(`задержка`);
+            clearInterval(interval);
+            setTimeout(() => {
+                console.log(`задержка окончена число ${count} пришло`);
+                tiposerver();
+            }, 3000);
+        } else {
+            console.log(`Число ${count} пришло`);
+        }
+    }, 5000);
+}
+
+
+
+
+
+
+
 
 document.querySelector("#accept-button")
     .addEventListener("click", (event) => validateInput(event));

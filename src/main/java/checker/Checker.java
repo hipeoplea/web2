@@ -2,13 +2,22 @@ package checker;
 
 import models.Point;
 
+import java.util.logging.Logger;
+
 public class Checker {
 
+    static Logger logger  = Logger.getLogger(Checker.class.getName());
     public static boolean check(Point p) {
         double x = p.getX();
         double y = p.getY();
         double r = p.getR();
-        return checkSquare(x, y, r) || checkCircle(x, y, r) || checkTriangle(x, y, r);
+        boolean square = checkSquare(x, y, r);
+        boolean circle = checkCircle(x, y, r);
+        boolean triangle = checkTriangle(x, y, r);
+
+
+//        logger.info("Point: " + p + ", Square: " + square + ", Circle: " + circle + ", Triangle: " + triangle);
+        return square || circle || triangle;
     }
 
 
@@ -22,9 +31,9 @@ public class Checker {
     }
 
     private static boolean checkTriangle(double x, double y, double r) {
-        boolean xBounds = (0 >= x) && (x <= r/2);
+        boolean xBounds = (0 <= x) && (x <= r/2);
         boolean yBounds = (y >= 0) && (y <= r);
-        boolean hypotenuse = (y >= 0.5 * x - r);
+        boolean hypotenuse = (y >= x*0.5 - r);
 
         return xBounds && yBounds && hypotenuse;
     }

@@ -1,7 +1,11 @@
 package servlets;
 
+import beans.BeanStatef;
+import beans.BeanStateless;
 import checker.Checker;
 import com.google.gson.Gson;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateful;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,30 +22,37 @@ import static java.lang.Double.parseDouble;
 
 @WebServlet("/areaCheck")
 public class AreaCheckServlet extends HttpServlet {
+    @EJB
+    BeanStatef beanStatef;
+    @EJB
+    BeanStateless beanStateless;
 
     Logger logger = Logger.getLogger(AreaCheckServlet.class.getName());
 
     @Override
-//    @SuppressWarnings("unchecked")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
+            logger.info(beanStatef.getSample());
+            logger.info(beanStateless.getSample());
+
             Point point = parseRequest(request);
             if (!validatePointValues(point)) {
                 throw new NumberFormatException();
             }
 
             point.setHit(Checker.check(point));
-            logger.info("Point: " + point);
-
             List<Point> dots = (List<Point>) request.getSession().getAttribute("result");
             if (dots == null) {
                 dots = new ArrayList<>();
             }
             dots.add(point);
+            logger.info("Stateful bean" + dots);
+            logger.info("Stateless bean" + point);
             request.getSession().setAttribute("result", dots);
+            request.getSession().setAttribute("point", point);
             Gson gson = new Gson();
             response.getWriter().write(gson.toJson(point));
         } catch (Exception e) {
